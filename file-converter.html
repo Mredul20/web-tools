@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Converter | Multi-Tool Web App</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        nav {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .home-link {
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .home-link:hover {
+            background-color: #ebf5ff;
+            transform: translateY(-2px);
+        }
+        
+        .home-link svg {
+            margin-right: 8px;
+        }
+        
+        nav a:not(.home-link) {
+            padding: 8px 14px;
+            text-decoration: none;
+            color: #4a5568;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        nav a:hover {
+            background-color: #f8fafc;
+            color: #3498db;
+            transform: translateY(-2px);
+        }
+        
+        nav a.active {
+            background-color: #ebf5ff;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .page-header {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        
+        .page-header:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            border-radius: 3px;
+        }
+        
+        .converter-container {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #edf2f7;
+            animation: fadeIn 0.6s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .conversion-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .conversion-type {
+            padding: 14px 22px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .conversion-type:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .conversion-type svg {
+            width: 20px;
+            height: 20px;
+            transition: all 0.3s;
+        }
+        
+        .conversion-type.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.25);
+        }
+        
+        .conversion-type.active svg {
+            stroke: white;
+        }
+
+        .converter-panel {
+            display: none;
+        }
+        
+        .converter-panel.active {
+            display: block;
+        }
+        
+        .upload-area {
+            border: 3px dashed #cbd5e0;
+            padding: 50px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 35px;
+            transition: all 0.3s;
+            cursor: pointer;
+            background-color: #f9fafc;
+        }
+        
+        .upload-area.active {
+            border-color: #3498db;
+            background-color: #ebf5ff;
+            transform: scale(1.01);
+        }
+        
+        .upload-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .upload-message img, .upload-message svg {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 20px;
+            opacity: 0.75;
+            transition: all 0.3s;
+            stroke: #3498db;
+        }
+        
+        .upload-area:hover .upload-message svg {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+        
+        .upload-message p {
+            margin-bottom: 0;
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+        
+        .upload-message .note {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+
+        .format-selection {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 18px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid #edf2f7;
+        }
+        
+        .format-selection label {
+            margin-right: 15px;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 1rem;
+        }
+        
+        select {
+            padding: 12px 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background-color: white;
+            min-width: 150px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+        
+        .quality-slider {
+            margin-top: 18px;
+            display: none;
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #edf2f7;
+            width: 100%;
+        }
+        
+        .quality-slider.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .quality-slider label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .quality-slider input[type="range"] {
+            width: 100%;
+            max-width: 300px;
+            height: 8px;
+            border-radius: 4px;
+            accent-color: #3498db;
+        }
+        
+        .quality-value {
+            margin-left: 10px;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .preview-area {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .preview-item {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .preview-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .file-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #3498db;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .file-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            color: #2d3748;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        
+        .file-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .download-btn {
+            padding: 10px 18px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 6px rgba(39, 174, 96, 0.2);
+            text-decoration: none;
+        }
+        
+        .download-btn:hover {
+            background-color: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(39, 174, 96, 0.25);
+        }
+        
+        .download-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .spinner {
+            display: none;
+            border: 3px solid rgba(52, 152, 219, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-panel {
+            margin-top: 35px;
+            padding: 25px;
+            background-color: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #edf2f7;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        .info-panel p {
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+        
+        .info-panel ul {
+            margin-left: 20px;
+            color: #4a5568;
+        }
+        
+        .info-panel ul li {
+            margin-bottom: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .upload-area {
+                padding: 30px 15px;
+            }
+            
+            .conversion-types {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .preview-area {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html" class="home-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Home
+            </a>
+            <a href="image-resizer.html">Image Resizer</a>
+            <a href="text-rewriter.html">Text Rewriter</a>
+            <a href="color-picker.html">Color Picker</a>
+            <a href="file-converter.html" class="active">File Converter</a>
+        </nav>
+        
+        <div class="page-header">
+            <h1>File Converter</h1>
+            <p>Convert files between different formats directly in your browser</p>
+        </div>
+        
+        <div class="converter-container">
+            <div class="conversion-types">
+                <div class="conversion-type active" data-type="image">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Image Converter
+                </div>
+                <div class="conversion-type" data-type="audio">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                    Audio Converter
+                </div>
+                <div class="conversion-type" data-type="document">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Document Converter
+                </div>
+            </div>
+            
+            <!-- Image Converter Panel -->
+            <div class="converter-panel active" id="image-converter">
+                <div class="upload-area" id="imageUploadArea">
+                    <div class="upload-message">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Drag & drop image files here or click to select</p>
+                    </div>
+                    <input type="file" id="imageFileInput" accept="image/*" multiple hidden>
+                </div>
+                
+                <div class="format-selection">
+                    <label for="imageFormat">Convert to:</label>
+                    <select id="imageFormat">
+                        <option value="jpeg">JPEG</option>
+                        <option value="png">PNG</option>
+                        <option value="webp">WebP</option>
+                        <option value="gif">GIF</option>
+                    </select>
+                    
+                    <div class="quality-slider" id="imageQualitySlider">
+                        <label>Quality: <span id="imageQualityValue">90</span>%</label>
+                        <input type="range" id="imageQuality" min="1" max="100" value="90">
+                    </div>
+                </div>
+                
+                <button id="convertImageBtn" class="primary-btn">Convert Images</button>
+                
+                <div id="imagePreviewArea" class="preview-area"></div>
+            </div>
+            
+            <!-- Audio Converter Panel -->
+            <div class="converter-panel" id="audio-converter">
+                <div class="upload-area" id="audioUploadArea">
+                    <div class="upload-message">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Drag & drop audio files here or click to select</p>
+                        <p class="note">Note: Audio conversion is limited by browser capabilities</p>
+                    </div>
+                    <input type="file" id="audioFileInput" accept="audio/*" multiple hidden>
+                </div>
+                
+                <div class="format-selection">
+                    <label for="audioFormat">Convert to:</label>
+                    <select id="audioFormat">
+                        <option value="mp3">MP3</option>
+                        <option value="wav">WAV</option>
+                        <option value="ogg">OGG</option>
+                    </select>
+                </div>
+                
+                <button id="convertAudioBtn" class="primary-btn">Convert Audio</button>
+                
+                <div id="audioPreviewArea" class="preview-area"></div>
+            </div>
+            
+            <!-- Document Converter Panel -->
+            <div class="converter-panel" id="document-converter">
+                <div class="upload-area" id="documentUploadArea">
+                    <div class="upload-message">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Drag & drop document files here or click to select</p>
+                        <p class="note">Supported formats: TXT, HTML, MD, CSV, JSON</p>
+                    </div>
+                    <input type="file" id="documentFileInput" accept=".txt,.html,.htm,.md,.csv,.json" multiple hidden>
+                </div>
+                
+                <div class="format-selection">
+                    <label for="documentFormat">Convert to:</label>
+                    <select id="documentFormat">
+                        <option value="txt">Plain Text (TXT)</option>
+                        <option value="html">HTML</option>
+                        <option value="md">Markdown (MD)</option>
+                        <option value="csv">CSV</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                
+                <button id="convertDocumentBtn" class="primary-btn">Convert Document</button>
+                
+                <div id="documentPreviewArea" class="preview-area"></div>
+
+                <div class="info-panel">
+                    <h3>About Document Conversion</h3>
+                    <p>This tool handles basic text-based document conversions in your browser. For more complex conversions (like PDFs, Word documents), you would typically need server-side processing.</p>
+                    <p>Current conversion capabilities:</p>
+                    <ul>
+                        <li>Convert between plain text, HTML, and Markdown</li>
+                        <li>Format CSV data and convert to/from JSON</li>
+                        <li>Syntax highlight code in various formats</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const conversionTypes = document.querySelectorAll('.conversion-type');
+            const converterPanels = document.querySelectorAll('.converter-panel');
+            
+            // Image converter elements
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const imageFileInput = document.getElementById('imageFileInput');
+            const imageFormat = document.getElementById('imageFormat');
+            const imageQualitySlider = document.getElementById('imageQualitySlider');
+            const imageQuality = document.getElementById('imageQuality');
+            const imageQualityValue = document.getElementById('imageQualityValue');
+            const convertImageBtn = document.getElementById('convertImageBtn');
+            const imagePreviewArea = document.getElementById('imagePreviewArea');
+            
+            // Audio converter elements
+            const audioUploadArea = document.getElementById('audioUploadArea');
+            const audioFileInput = document.getElementById('audioFileInput');
+            const audioFormat = document.getElementById('audioFormat');
+            const convertAudioBtn = document.getElementById('convertAudioBtn');
+            const audioPreviewArea = document.getElementById('audioPreviewArea');
+            
+            // Document converter elements
+            const documentUploadArea = document.getElementById('documentUploadArea');
+            const documentFileInput = document.getElementById('documentFileInput');
+            const documentFormat = document.getElementById('documentFormat');
+            const convertDocumentBtn = document.getElementById('convertDocumentBtn');
+            const documentPreviewArea = document.getElementById('documentPreviewArea');
+            
+            let uploadedImageFiles = [];
+            let uploadedAudioFiles = [];
+            let uploadedDocumentFiles = [];
+            
+            // Handle conversion type selection
+            conversionTypes.forEach((type, index) => {
+                type.addEventListener('click', function() {
+                    conversionTypes.forEach(t => t.classList.remove('active'));
+                    converterPanels.forEach(p => p.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    converterPanels[index].classList.add('active');
+                });
+            });
+            
+            // Image format change - show/hide quality slider
+            imageFormat.addEventListener('change', function() {
+                if (this.value === 'jpeg' || this.value === 'webp') {
+                    imageQualitySlider.classList.add('active');
+                } else {
+                    imageQualitySlider.classList.remove('active');
+                }
+            });
+            
+            // Quality slider value update
+            imageQuality.addEventListener('input', function() {
+                imageQualityValue.textContent = this.value;
+            });
+            
+            // Image Upload Area
+            imageUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.add('active');
+            });
+            
+            imageUploadArea.addEventListener('dragleave', () => {
+                imageUploadArea.classList.remove('active');
+            });
+            
+            imageUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadArea.classList.remove('active');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageFiles(files);
+                }
+            });
+            
+            imageUploadArea.addEventListener('click', () => {
+                imageFileInput.click();
+            });
+            
+            imageFileInput.addEventListener('change', () => {
+                if (imageFileInput.files.length > 0) {
+                    handleImageFiles(imageFileInput.files);
+                }
+            });
+            
+            // Audio Upload Area
+            audioUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                audioUploadArea.classList.add('active');
+            });
+            
+            audioUploadArea.addEventListener('dragleave', () => {
+                audioUploadArea.classList.remove('active');
+            });
+            
+            audioUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                audioUploadArea.classList.remove('active');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleAudioFiles(files);
+                }
+            });
+            
+            audioUploadArea.addEventListener('click', () => {
+                audioFileInput.click();
+            });
+            
+            audioFileInput.addEventListener('change', () => {
+                if (audioFileInput.files.length > 0) {
+                    handleAudioFiles(audioFileInput.files);
+                }
+            });
+            
+            // Document Upload Area
+            documentUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                documentUploadArea.classList.add('active');
+            });
+            
+            documentUploadArea.addEventListener('dragleave', () => {
+                documentUploadArea.classList.remove('active');
+            });
+            
+            documentUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                documentUploadArea.classList.remove('active');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleDocumentFiles(files);
+                }
+            });
+            
+            documentUploadArea.addEventListener('click', () => {
+                documentFileInput.click();
+            });
+            
+            documentFileInput.addEventListener('change', () => {
+                if (documentFileInput.files.length > 0) {
+                    handleDocumentFiles(documentFileInput.files);
+                }
+            });
+            
+            // Convert buttons
+            convertImageBtn.addEventListener('click', function() {
+                if (uploadedImageFiles.length === 0) {
+                    alert('Please upload at least one image.');
+                    return;
+                }
+                
+                convertImages();
+            });
+            
+            convertAudioBtn.addEventListener('click', function() {
+                if (uploadedAudioFiles.length === 0) {
+                    alert('Please upload at least one audio file.');
+                    return;
+                }
+                
+                alert('Audio conversion is limited in browser environment. This feature is for demonstration purposes.');
+            });
+            
+            convertDocumentBtn.addEventListener('click', function() {
+                if (uploadedDocumentFiles.length === 0) {
+                    alert('Please upload at least one document.');
+                    return;
+                }
+                
+                convertDocuments();
+            });
+            
+            // Handle uploaded image files
+            function handleImageFiles(files) {
+                uploadedImageFiles = [];
+                imagePreviewArea.innerHTML = '';
+                
+                Array.from(files).forEach((file) => {
+                    if (!file.type.match('image.*')) {
+                        alert(`${file.name} is not an image file.`);
+                        return;
+                    }
+                    
+                    uploadedImageFiles.push(file);
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        createImagePreview(file, e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            // Handle uploaded audio files
+            function handleAudioFiles(files) {
+                uploadedAudioFiles = [];
+                audioPreviewArea.innerHTML = '';
+                
+                Array.from(files).forEach((file) => {
+                    if (!file.type.match('audio.*')) {
+                        alert(`${file.name} is not an audio file.`);
+                        return;
+                    }
+                    
+                    uploadedAudioFiles.push(file);
+                    
+                    // Create audio preview
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    
+                    const fileDetails = document.createElement('div');
+                    fileDetails.className = 'file-details';
+                    
+                    const fileIcon = document.createElement('div');
+                    fileIcon.className = 'file-icon';
+                    fileIcon.textContent = getFileExtension(file.name).toUpperCase();
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.className = 'file-info';
+                    
+                    const fileName = document.createElement('h3');
+                    fileName.textContent = file.name;
+                    
+                    const fileSize = document.createElement('p');
+                    fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+                    
+                    fileInfo.appendChild(fileName);
+                    fileInfo.appendChild(fileSize);
+                    
+                    fileDetails.appendChild(fileIcon);
+                    fileDetails.appendChild(fileInfo);
+                    
+                    previewItem.appendChild(fileDetails);
+                    
+                    audioPreviewArea.appendChild(previewItem);
+                });
+            }
+            
+            // Handle uploaded document files
+            function handleDocumentFiles(files) {
+                uploadedDocumentFiles = [];
+                documentPreviewArea.innerHTML = '';
+                
+                Array.from(files).forEach((file) => {
+                    const ext = getFileExtension(file.name).toLowerCase();
+                    const validExtensions = ['txt', 'html', 'htm', 'md', 'csv', 'json'];
+                    
+                    if (!validExtensions.includes(ext)) {
+                        alert(`${file.name} is not a supported document type. Supported: TXT, HTML, MD, CSV, JSON`);
+                        return;
+                    }
+                    
+                    uploadedDocumentFiles.push(file);
+                    
+                    // Create document preview
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    
+                    const fileDetails = document.createElement('div');
+                    fileDetails.className = 'file-details';
+                    
+                    const fileIcon = document.createElement('div');
+                    fileIcon.className = 'file-icon';
+                    fileIcon.textContent = ext.toUpperCase();
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.className = 'file-info';
+                    
+                    const fileName = document.createElement('h3');
+                    fileName.textContent = file.name;
+                    
+                    const fileSize = document.createElement('p');
+                    fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+                    
+                    fileInfo.appendChild(fileName);
+                    fileInfo.appendChild(fileSize);
+                    
+                    fileDetails.appendChild(fileIcon);
+                    fileDetails.appendChild(fileInfo);
+                    
+                    previewItem.appendChild(fileDetails);
+                    
+                    const spinner = document.createElement('div');
+                    spinner.className = 'spinner';
+                    previewItem.appendChild(spinner);
+                    
+                    documentPreviewArea.appendChild(previewItem);
+                });
+            }
+            
+            // Create image preview
+            function createImagePreview(file, dataUrl) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                const fileDetails = document.createElement('div');
+                fileDetails.className = 'file-details';
+                
+                const fileIcon = document.createElement('div');
+                fileIcon.className = 'file-icon';
+                
+                const iconImg = document.createElement('img');
+                iconImg.src = dataUrl;
+                iconImg.style.maxWidth = '40px';
+                iconImg.style.maxHeight = '40px';
+                
+                fileIcon.appendChild(iconImg);
+                
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+                
+                const fileName = document.createElement('h3');
+                fileName.textContent = file.name;
+                
+                const fileSize = document.createElement('p');
+                fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+                
+                fileInfo.appendChild(fileName);
+                fileInfo.appendChild(fileSize);
+                
+                fileDetails.appendChild(fileIcon);
+                fileDetails.appendChild(fileInfo);
+                
+                previewItem.appendChild(fileDetails);
+                
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner';
+                previewItem.appendChild(spinner);
+                
+                imagePreviewArea.appendChild(previewItem);
+            }
+            
+            // Convert images
+            function convertImages() {
+                const format = imageFormat.value;
+                const quality = parseInt(imageQuality.value) / 100;
+                const previewItems = imagePreviewArea.querySelectorAll('.preview-item');
+                
+                uploadedImageFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+                            
+                            const previewItem = previewItems[index];
+                            const spinner = previewItem.querySelector('.spinner');
+                            spinner.style.display = 'block';
+                            
+                            setTimeout(() => {
+                                // Convert to desired format
+                                const mimeType = `image/${format === 'jpeg' ? 'jpeg' : format}`;
+                                const dataUrl = canvas.toDataURL(mimeType, quality);
+                                
+                                // Create download link
+                                const downloadBtn = document.createElement('a');
+                                downloadBtn.className = 'download-btn';
+                                downloadBtn.textContent = 'Download';
+                                downloadBtn.href = dataUrl;
+                                downloadBtn.download = `converted_${getFileNameWithoutExtension(file.name)}.${format}`;
+                                
+                                // Remove existing download button if any
+                                const existingBtn = previewItem.querySelector('.download-btn');
+                                if (existingBtn) {
+                                    existingBtn.remove();
+                                }
+                                
+                                // Hide spinner and add download button
+                                spinner.style.display = 'none';
+                                previewItem.appendChild(downloadBtn);
+                            }, 500); // Simulate processing time
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            // Convert documents
+            function convertDocuments() {
+                const format = documentFormat.value;
+                const previewItems = documentPreviewArea.querySelectorAll('.preview-item');
+                
+                uploadedDocumentFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        const content = e.target.result;
+                        const previewItem = previewItems[index];
+                        const spinner = previewItem.querySelector('.spinner');
+                        spinner.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            try {
+                                // Get source format from file extension
+                                const sourceFormat = getFileExtension(file.name).toLowerCase();
+                                
+                                // Convert content based on source and target formats
+                                const convertedContent = convertDocumentContent(content, sourceFormat, format);
+                                
+                                // Create blob and download link
+                                const blob = new Blob([convertedContent], { type: getMimeType(format) });
+                                const url = URL.createObjectURL(blob);
+                                
+                                const downloadBtn = document.createElement('a');
+                                downloadBtn.className = 'download-btn';
+                                downloadBtn.textContent = 'Download';
+                                downloadBtn.href = url;
+                                downloadBtn.download = `converted_${getFileNameWithoutExtension(file.name)}.${format}`;
+                                
+                                // Remove existing download button if any
+                                const existingBtn = previewItem.querySelector('.download-btn');
+                                if (existingBtn) {
+                                    existingBtn.remove();
+                                }
+                                
+                                // Hide spinner and add download button
+                                spinner.style.display = 'none';
+                                previewItem.appendChild(downloadBtn);
+                            } catch (err) {
+                                spinner.style.display = 'none';
+                                alert(`Error converting ${file.name}: ${err.message}`);
+                            }
+                        }, 800); // Simulate processing time
+                    };
+                    
+                    // Read file as text
+                    reader.readAsText(file);
+                });
+            }
+            
+            // Function to convert document content between formats
+            function convertDocumentContent(content, sourceFormat, targetFormat) {
+                // If source and target formats are the same, just return the content
+                if (sourceFormat === targetFormat) {
+                    return content;
+                }
+                
+                // Handle various conversion scenarios
+                
+                // Convert from CSV to JSON
+                if (sourceFormat === 'csv' && targetFormat === 'json') {
+                    return csvToJson(content);
+                }
+                
+                // Convert from JSON to CSV
+                if (sourceFormat === 'json' && targetFormat === 'csv') {
+                    return jsonToCsv(content);
+                }
+                
+                // Convert from HTML to Text
+                if (sourceFormat === 'html' && targetFormat === 'txt') {
+                    return htmlToText(content);
+                }
+                
+                // Convert from HTML to Markdown
+                if ((sourceFormat === 'html' || sourceFormat === 'htm') && targetFormat === 'md') {
+                    return htmlToMarkdown(content);
+                }
+                
+                // Convert from Markdown to HTML
+                if (sourceFormat === 'md' && (targetFormat === 'html' || targetFormat === 'htm')) {
+                    return markdownToHtml(content);
+                }
+                
+                // Convert from Markdown to Text
+                if (sourceFormat === 'md' && targetFormat === 'txt') {
+                    return markdownToText(content);
+                }
+                
+                // For other cases or simple text transformations
+                return content;
+            }
+            
+            // CSV to JSON conversion
+            function csvToJson(csvContent) {
+                // Split by lines and get headers
+                const lines = csvContent.split('\n').map(line => line.trim()).filter(line => line);
+                if (lines.length === 0) return '[]';
+                
+                const headers = lines[0].split(',').map(header => header.trim());
+                const jsonResult = [];
+                
+                // Process each line
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(value => value.trim());
+                    const entry = {};
+                    
+                    headers.forEach((header, index) => {
+                        entry[header] = values[index] || '';
+                    });
+                    
+                    jsonResult.push(entry);
+                }
+                
+                return JSON.stringify(jsonResult, null, 2);
+            }
+            
+            // JSON to CSV conversion
+            function jsonToCsv(jsonContent) {
+                let jsonData;
+                try {
+                    jsonData = JSON.parse(jsonContent);
+                } catch (e) {
+                    throw new Error('Invalid JSON format');
+                }
+                
+                if (!Array.isArray(jsonData) || jsonData.length === 0) {
+                    return '';
+                }
+                
+                // Get headers from the first object
+                const headers = Object.keys(jsonData[0]);
+                let csvContent = headers.join(',') + '\n';
+                
+                // Process each object
+                jsonData.forEach(item => {
+                    const values = headers.map(header => {
+                        const value = item[header] || '';
+                        // Handle values with commas by enclosing them in quotes
+                        return typeof value === 'string' && value.includes(',') 
+                            ? `"${value}"` 
+                            : value;
+                    });
+                    csvContent += values.join(',') + '\n';
+                });
+                
+                return csvContent;
+            }
+            
+            // HTML to Text conversion
+            function htmlToText(htmlContent) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                return tempDiv.textContent || tempDiv.innerText || '';
+            }
+            
+            // HTML to Markdown conversion (simplified)
+            function htmlToMarkdown(htmlContent) {
+                let markdown = htmlContent;
+                
+                // Replace headings
+                markdown = markdown.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n');
+                markdown = markdown.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n');
+                markdown = markdown.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n');
+                
+                // Replace paragraphs
+                markdown = markdown.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
+                
+                // Replace links
+                markdown = markdown.replace(/<a[^>]*href=["'](.*?)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+                
+                // Replace bold and italic
+                markdown = markdown.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+                markdown = markdown.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+                markdown = markdown.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+                markdown = markdown.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+                
+                // Replace lists
+                markdown = markdown.replace(/<ul[^>]*>(.*?)<\/ul>/gis, '$1\n');
+                markdown = markdown.replace(/<ol[^>]*>(.*?)<\/ol>/gis, '$1\n');
+                markdown = markdown.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
+                
+                // Replace line breaks
+                markdown = markdown.replace(/<br\s*\/?>/gi, '\n');
+                
+                // Strip remaining HTML tags
+                markdown = markdown.replace(/<[^>]+>/g, '');
+                
+                // Clean up multiple newlines
+                markdown = markdown.replace(/\n{3,}/g, '\n\n');
+                
+                return markdown;
+            }
+            
+            // Markdown to HTML conversion (simplified)
+            function markdownToHtml(markdownContent) {
+                let html = markdownContent;
+                
+                // Replace headings
+                html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+                html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+                html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+                
+                // Replace paragraphs
+                html = html.replace(/^(?!<h|<ul|<ol|<li|<\/)(.*?)$/gm, '<p>$1</p>');
+                
+                // Replace links
+                html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+                
+                // Replace bold and italic
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+                // Replace lists
+                html = html.replace(/- (.*?)(?:\n|$)/g, '<li>$1</li>');
+                
+                // Wrap lists
+                if (html.includes('<li>')) {
+                    html = html.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
+                }
+                
+                return html;
+            }
+            
+            // Markdown to Text conversion
+            function markdownToText(markdownContent) {
+                // Convert to HTML first, then strip the HTML tags
+                const html = markdownToHtml(markdownContent);
+                return htmlToText(html);
+            }
+            
+            // Get MIME type for a file format
+            function getMimeType(format) {
+                const mimeTypes = {
+                    'txt': 'text/plain',
+                    'html': 'text/html',
+                    'htm': 'text/html',
+                    'md': 'text/markdown',
+                    'csv': 'text/csv',
+                    'json': 'application/json'
+                };
+                return mimeTypes[format] || 'text/plain';
+            }
+            
+            // Helper function to get file extension
+            function getFileExtension(filename) {
+                return filename.split('.').pop();
+            }
+            
+            // Helper function to get file name without extension
+            function getFileNameWithoutExtension(filename) {
+                return filename.split('.').slice(0, -1).join('.');
+            }
+        });
+    </script>
+</body>
+</html>

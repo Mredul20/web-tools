@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer | Multi-Tool Web App</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        nav {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .home-link {
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .home-link:hover {
+            background-color: #ebf5ff;
+            transform: translateY(-2px);
+        }
+        
+        .home-link svg {
+            margin-right: 8px;
+        }
+        
+        nav a:not(.home-link) {
+            padding: 8px 14px;
+            text-decoration: none;
+            color: #4a5568;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        nav a:hover {
+            background-color: #f8fafc;
+            color: #3498db;
+            transform: translateY(-2px);
+        }
+        
+        nav a.active {
+            background-color: #ebf5ff;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .page-header {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        
+        .page-header:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            border-radius: 3px;
+        }
+        
+        .controls-wrapper {
+            animation: fadeIn 0.6s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html" class="home-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Home
+            </a>
+            <a href="image-resizer.html" class="active">Image Resizer</a>
+            <a href="text-rewriter.html">Text Rewriter</a>
+            <a href="color-picker.html">Color Picker</a>
+            <a href="file-converter.html">File Converter</a>
+        </nav>
+        
+        <div class="page-header">
+            <h1>Bulk Image Resizer</h1>
+            <p>Resize multiple images at once, right in your browser</p>
+        </div>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-message">
+                <img src="upload-icon.svg" alt="Upload">
+                <p>Drag & drop images here or click to select</p>
+            </div>
+            <input type="file" id="fileInput" multiple accept="image/*" hidden>
+        </div>
+        
+        <div class="settings-panel controls-wrapper">
+            <!-- Width/height settings -->
+            <div class="dimension-controls">
+                <label>Width: <input type="number" id="width" value="800"> px</label>
+                <label>Height: <input type="number" id="height" value="600"> px</label>
+                <label><input type="checkbox" id="maintainAspect" checked> Maintain aspect ratio</label>
+            </div>
+            
+            <!-- Format options -->
+            <div class="format-controls">
+                <label>Output format:
+                    <select id="format">
+                        <option value="jpeg">JPEG</option>
+                        <option value="png">PNG</option>
+                        <option value="webp">WEBP</option>
+                    </select>
+                </label>
+                <label>Quality: <input type="range" id="quality" min="1" max="100" value="90"></label>
+            </div>
+            
+            <button id="processBtn" class="primary-btn">Process Images</button>
+        </div>
+        
+        <div class="preview-area" id="previewArea"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
